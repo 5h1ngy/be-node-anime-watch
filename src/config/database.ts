@@ -1,24 +1,35 @@
-import path from 'path'
+import path from 'path';
 import { Sequelize } from 'sequelize-typescript';
 
-import { AnimeDetails } from "@/models";
-import { AnimeReferences } from "@/models";
-import { AssetImages } from "@/models";
-import { TagDetails } from "@/models";
-import { TagReferences } from "@/models";
-import { AnimeTags } from "@/models";
-import { logWarn } from "@/utils/logger";
+import AnimeDetails from "@/models/AnimeDetails";
+import AnimeReferences from "@/models/AnimeReferences";
+import TagDetails from "@/models/TagDetails";
+import TagReferences from "@/models/TagReferences";
+import AssetImages from "@/models/AssetImages";
+import AnimeTags from "@/models/AnimeTags";
+import { logWarn, logVerbose } from "@/shared/logger";
 
+/**
+ * Configura l'istanza Sequelize per la gestione del database SQLite.
+ */
 const sequelize = new Sequelize({
     dialect: 'sqlite',
-    storage: path.resolve(__dirname, '..', '..', 'data', process.env.DB_STORAGE || ''),
-    logging: process.env.DB_LOGGING === "true" ? logWarn : false || true,
-    models: [AnimeDetails, AnimeReferences, AssetImages, TagDetails, TagReferences, AnimeTags],
+    storage: process.env.NODE_ENV === "development"
+        ? path.resolve(__dirname, "..", "..", "data", process.env.STORAGE_FILE || 'db_dump.db')
+        : path.resolve(process.cwd(), "data", process.env.STORAGE_FILE || 'db_dump.db'),
+    logging: process.env.LOGGING_DB === "true" ? logVerbose : false || false,
+    models: [AnimeDetails, AnimeReferences, TagDetails, TagReferences, AssetImages, AnimeTags],
 });
 
+/**
+ * Funzione per connettersi al database.
+ * @throws Lancia un errore se la connessione al database fallisce.
+ */
 export async function connect() {
     try {
-        await sequelize.sync({ alter: false });
+        await sequelize.authenticate();
+        console.log("Connection has been established successfully.");
+        await sequelize.sync();
         logWarn("Database synchronized successfully!");
     } catch (error) {
         console.error("Error synchronizing database:", error);
@@ -26,6 +37,10 @@ export async function connect() {
     }
 }
 
+/**
+ * Funzione per disconnettersi dal database.
+ * @throws Lancia un errore se la disconnessione dal database fallisce.
+ */
 export async function disconnect() {
     try {
         await sequelize.close();

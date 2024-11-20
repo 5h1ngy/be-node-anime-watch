@@ -5,7 +5,7 @@ import { createExpressServer } from "routing-controllers";
 import { connect, disconnect } from "@/config/database";
 import { errorHandler } from "@/middleware/errorHandler";
 import { AnimeDetailsController } from "@/controllers/AnimeDetailsController";
-import { setupHttpLogging, logInfo, logError, logWarn } from "@/utils/logger";
+import { setupHttpLogging, logInfo, logError, logWarn } from "@/shared/logger";
 
 
 // Registra i controller

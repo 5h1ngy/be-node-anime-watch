@@ -3,10 +3,14 @@ import "winston-daily-rotate-file";
 import morgan, { StreamOptions } from "morgan";
 import path from "path";
 import fs from "fs";
-import { TransformableInfo } from "logform"; // Importa TransformableInfo da logform
+import { TransformableInfo } from "logform";
+
+// Percorso della directory dei log
+const logDirectory = process.env.NODE_ENV === "development"
+    ? path.resolve(__dirname, "..", "..", "logs")
+    : path.resolve(process.cwd(), "logs");
 
 // Crea la cartella dei log se non esiste
-const logDirectory = path.join(process.cwd(), "logs");
 if (!fs.existsSync(logDirectory)) {
     fs.mkdirSync(logDirectory, { recursive: true });
 }
@@ -16,8 +20,19 @@ const transport = new winston.transports.DailyRotateFile({
     filename: `${logDirectory}/%DATE%.log`,
     datePattern: "YYYY-MM-DD",
     zippedArchive: true,
-    maxSize: "20m",
-    maxFiles: "14d", // Mantiene i log per 14 giorni
+    maxSize: "20m", // Limite dimensione file
+    maxFiles: "14d", // Mantieni log per 14 giorni
+});
+
+// Aggiungi colori personalizzati ai livelli di log
+winston.addColors({
+    error: "bold red",
+    warn: "yellow",
+    info: "green",
+    http: "magenta",
+    verbose: "cyan",
+    debug: "blue",
+    silly: "magenta",
 });
 
 // Formato personalizzato per i log
@@ -28,38 +43,35 @@ const logFormat = winston.format.printf((info: TransformableInfo) => {
 
 // Crea il logger principale
 const logger = winston.createLogger({
-    level: process.env.LOG_DEFAULT_LEVEL || "info", // Livello di log predefinito con fallback
+    level: process.env.LOG_DEFAULT_LEVEL || "info", // Livello di log predefinito
     format: winston.format.combine(
-        winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }), // Timestamp nei log
+        winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }), // Timestamp
+        process.env.NODE_ENV === "development"
+            ? winston.format.colorize({ all: true }) // Colori per sviluppo
+            : winston.format.uncolorize(), // Senza colori per file
         logFormat
     ),
     transports: [
-        transport, // Scrive nei file con rotazione
-        new winston.transports.Console({
+        transport, // Log rotanti su file
+        new winston.transports.Console({ // Log sulla console
             format: winston.format.combine(
-                process.env.NODE_ENV === "development"
-                    ? winston.format.uncolorize()
-                    : winston.format.colorize(),
+                winston.format.colorize({ all: true }),
                 winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
                 logFormat
             ),
         }),
     ],
     exceptionHandlers: [
-        new winston.transports.File({
-            filename: path.join(logDirectory, "exceptions.log"),
-        }),
+        new winston.transports.File({ filename: path.join(logDirectory, "exceptions.log") }), // Eccezioni su file
     ],
     rejectionHandlers: [
-        new winston.transports.File({
-            filename: path.join(logDirectory, "rejections.log"),
-        }),
+        new winston.transports.File({ filename: path.join(logDirectory, "rejections.log") }), // Rifiuti di promesse su file
     ],
 });
 
 // Stream per Morgan
 const stream: StreamOptions = {
-    write: (message: string) => logger.info(message.trim()),
+    write: (message: string) => logger.http(message.trim()),
 };
 
 /**
@@ -102,6 +114,13 @@ export function logInfo(message: string): void {
 }
 
 /**
+ * Registra un messaggio dettagliato.
+ */
+export function logVerbose(message: string): void {
+    logger.verbose(message);
+}
+
+/**
  * Registra una richiesta HTTP.
  */
 export function logHttpRequest(req: any): void {
@@ -109,7 +128,7 @@ export function logHttpRequest(req: any): void {
     const logEntry = `HTTP Request - Method: ${method}, URL: ${url}, Headers: ${JSON.stringify(
         headers
     )}, Body: ${JSON.stringify(body)}`;
-    logger.info(logEntry);
+    logger.http(logEntry);
 }
 
 // Gestione delle eccezioni non catturate

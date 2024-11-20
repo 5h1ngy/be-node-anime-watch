@@ -1,6 +1,6 @@
 import { AnimeDetails } from "@/models";
 import { AnimeDetailsDto } from "@/dtos/AnimeDetailsDto";
-import { logInfo } from "@/utils/logger";
+import { logInfo } from "@/shared/logger";
 
 export interface PaginatedResult<T> {
   data: T[];
