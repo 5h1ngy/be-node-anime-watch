@@ -1,6 +1,6 @@
-import { AnimeDetails } from "@/models";
+import AnimeDetails from "@/models/AnimeDetails";
 import { AnimeDetailsDto } from "@/dtos/AnimeDetailsDto";
-import { logInfo } from "@/shared/logger";
+import { Service } from "typedi";
 
 export interface PaginatedResult<T> {
   data: T[];
@@ -10,61 +10,26 @@ export interface PaginatedResult<T> {
   totalPages: number;
 }
 
+@Service()
 export class AnimeDetailsService {
   async getAll(page: number = 1, limit: number = 10): Promise<PaginatedResult<AnimeDetailsDto>> {
     const offset = (page - 1) * limit;
-
-    // Ottieni i dati con paginazione e includi le associazioni
     const { rows, count: total } = await AnimeDetails.findAndCountAll({
       offset,
       limit,
-      include: [
-        {
-          association: "assetImage", // Nome dell'associazione definito con `as`
-        },
-      ],
+      include: [{ association: "asset", required: false }],
     });
 
-    // Mappare i dati al DTO
-    const data: AnimeDetailsDto[] = rows.map((anime) => {
-      return new AnimeDetailsDto(
-        anime.id,
-        anime.type || "Unknown",
-        anime.assetImage?.base64 || '',
-        // ''  // Accesso ai dati associati
-      );
-    });
-
+    const data = rows.map((anime) => new AnimeDetailsDto(anime.id, anime.type || "Unknown", anime.asset?.thumbnail || null));
     const totalPages = Math.ceil(total / limit);
 
     return { data, total, page, limit, totalPages };
   }
 
   async getById(id: string): Promise<AnimeDetailsDto | null> {
-    const anime = await AnimeDetails.findByPk(id);
+    const anime = await AnimeDetails.findByPk(id, { include: [{ association: "asset" }] });
     if (!anime) return null;
 
-    // Mappa il singolo risultato al DTO
-    return new AnimeDetailsDto(anime.id, anime.type || "Unknown", '');
-  }
-
-  async create(data: Partial<AnimeDetails>): Promise<AnimeDetails> {
-    return AnimeDetails.create(data);
-  }
-
-  async update(id: string, data: Partial<AnimeDetails>): Promise<AnimeDetails | null> {
-    const animeDetails = await AnimeDetails.findByPk(id);
-    if (!animeDetails) {
-      throw new Error("AnimeDetails not found");
-    }
-    return animeDetails.update(data);
-  }
-
-  async delete(id: string): Promise<void> {
-    const animeDetails = await AnimeDetails.findByPk(id);
-    if (!animeDetails) {
-      throw new Error("AnimeDetails not found");
-    }
-    await animeDetails.destroy();
+    return new AnimeDetailsDto(anime.id, anime.type || "Unknown", anime.asset?.thumbnail || null);
   }
 }

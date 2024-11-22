@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ES2019",
+    "target": "ES2021",
     "module": "CommonJS",
     "outDir": "dist",
     "rootDir": "src",
@@ -10,6 +10,8 @@
     "emitDecoratorMetadata": true,
     "sourceMap": true,
     "inlineSources": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
     "baseUrl": "./",
     "paths": {
       "@/*": ["src/*"]
