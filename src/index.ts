@@ -5,9 +5,11 @@ import { Container } from "typedi";
 import express from "express";
 import helmet from "helmet";
 import cors from "cors";
-import { useExpressServer, useContainer, getMetadataArgsStorage } from "routing-controllers";
+import { useExpressServer, getMetadataArgsStorage, useContainer } from "routing-controllers";
 import swaggerUi from "swagger-ui-express";
 import { routingControllersToSpec } from "routing-controllers-openapi";
+import { validationMetadatasToSchemas } from "class-validator-jsonschema";
+import { getFromContainer, MetadataStorage } from "class-validator";
 
 import { connect, disconnect } from "@/config/database";
 import { errorHandler } from "@/middleware/errorHandler";
@@ -49,13 +51,20 @@ class App {
                 crossOriginEmbedderPolicy: false,
             })
         );
-        this.app.use(cors({ origin: "*", methods: ["GET"], optionsSuccessStatus: 200 }));
+        this.app.use(
+            cors({
+                origin: "*",
+                methods: ["GET"],
+                optionsSuccessStatus: 200,
+            })
+        );
         this.app.use(express.json());
         this.app.use(express.urlencoded({ extended: true }));
         setupHttpLogging(this.app);
     }
 
     private setupControllers(): void {
+        // Rotte sotto /api
         useExpressServer(this.app, {
             controllers: [
                 AnimeDetailsController,
@@ -67,7 +76,7 @@ class App {
             routePrefix: "/api",
         });
 
-        // Registra HealthController senza prefisso
+        // HealthController senza prefisso
         useExpressServer(this.app, {
             controllers: [HealthController],
             defaultErrorHandler: false,
@@ -76,7 +85,26 @@ class App {
 
     private setupSwagger(): void {
         const storage = getMetadataArgsStorage();
-        const spec = routingControllersToSpec(storage, {}, { info: { title: "Anime API", version: "1.0.0" } });
+        const schemas = validationMetadatasToSchemas({
+            classValidatorMetadataStorage: getFromContainer(MetadataStorage),
+        });
+
+        const spec = routingControllersToSpec(
+            storage,
+            {
+                routePrefix: "/api",
+            },
+            {
+                components: {
+                    schemas,
+                },
+                info: {
+                    title: "Anime API",
+                    version: "1.0.0",
+                },
+            }
+        );
+
         this.app.use("/docs", swaggerUi.serve, swaggerUi.setup(spec));
     }
 

@@ -13,7 +13,12 @@ export class AnimeDetailsController {
     private animeDetailsService: AnimeDetailsService
   ) { }
 
-  // Endpoint esistente per ottenere tutti gli anime
+  /**
+    * Ottiene una lista paginata di dettagli degli anime.
+    * @param page Numero di pagina
+    * @param limit Numero di elementi per pagina
+    * @returns PaginatedResult di AnimeDetailsDto
+    */
   @Get("/")
   async getAll(
     @QueryParam("page", { required: false }) page: number = 1,
@@ -23,7 +28,11 @@ export class AnimeDetailsController {
     return result;
   }
 
-  // Nuovo endpoint per ottenere un anime per ID
+  /**
+ * Ottiene i dettagli di un anime per ID.
+ * @param id Identificatore dell'anime
+ * @returns AnimeDetailsDto o null se non trovato
+ */
   @Get("/:id")
   async getById(@Param("id") id: string): Promise<AnimeDetailsDto | null> {
     const result = await this.animeDetailsService.getById(id);
