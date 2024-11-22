@@ -11,9 +11,13 @@ import { routingControllersToSpec } from "routing-controllers-openapi";
 
 import { connect, disconnect } from "@/config/database";
 import { errorHandler } from "@/middleware/errorHandler";
-import { AnimeDetailsController } from "@/controllers/AnimeDetailsController";
-import { HealthController } from "@/controllers/HealthController";
 import { setupHttpLogging, logInfo, logError, logWarn } from "@/shared/logger";
+
+import { AnimeDetailsController } from "@/controllers/AnimeDetailsController";
+import { AssetImagesController } from "@/controllers/AssetImagesController";
+import { TagDetailsController } from "@/controllers/TagDetailsController";
+import { AnimeTagsController } from "@/controllers/AnimeTagsController";
+import { HealthController } from "@/controllers/HealthController";
 
 class App {
     private static instance: App;
@@ -53,7 +57,19 @@ class App {
 
     private setupControllers(): void {
         useExpressServer(this.app, {
-            controllers: [AnimeDetailsController, HealthController],
+            controllers: [
+                AnimeDetailsController,
+                AssetImagesController,
+                TagDetailsController,
+                AnimeTagsController,
+            ],
+            defaultErrorHandler: false,
+            routePrefix: "/api",
+        });
+
+        // Registra HealthController senza prefisso
+        useExpressServer(this.app, {
+            controllers: [HealthController],
             defaultErrorHandler: false,
         });
     }
