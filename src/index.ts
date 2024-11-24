@@ -19,6 +19,10 @@ import { AnimeDetailsController } from "@/controllers/AnimeDetailsController";
 import { TagDetailsController } from "@/controllers/TagDetailsController";
 import { HealthController } from "@/controllers/HealthController";
 
+/**
+ * Main application class.
+ * Initializes the Express server, controllers, and middleware.
+ */
 class App {
     private static instance: App;
     public app: express.Application;
@@ -33,6 +37,9 @@ class App {
         this.handleProcessEvents();
     }
 
+    /**
+     * Retrieves the singleton instance of the application.
+     */
     public static getInstance(): App {
         if (!App.instance) {
             App.instance = new App();
@@ -40,6 +47,9 @@ class App {
         return App.instance;
     }
 
+    /**
+     * Configures middlewares such as Helmet, CORS, and HTTP logging.
+     */
     private config(): void {
         useContainer(Container);
         this.app.use(
@@ -61,8 +71,10 @@ class App {
         setupHttpLogging(this.app);
     }
 
+    /**
+     * Sets up the application controllers with routing-controllers.
+     */
     private setupControllers(): void {
-        // Rotte sotto /api
         useExpressServer(this.app, {
             controllers: [
                 AnimeDetailsController,
@@ -72,13 +84,15 @@ class App {
             routePrefix: "/api",
         });
 
-        // HealthController senza prefisso
         useExpressServer(this.app, {
             controllers: [HealthController],
             defaultErrorHandler: false,
         });
     }
 
+    /**
+     * Configures Swagger documentation for the API.
+     */
     private setupSwagger(): void {
         const storage = getMetadataArgsStorage();
         const schemas = validationMetadatasToSchemas({
@@ -92,9 +106,9 @@ class App {
             },
             {
                 components: {
+                    // Disable TS errors for OpenAPI
                     /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */
-                    // @ts-ignore: Problema noto con OpenAPI e class-validator
-                    // @ts-expect-error
+                    // @ts-ignore
                     schemas,
                 },
                 info: {
@@ -107,10 +121,16 @@ class App {
         this.app.use("/docs", swaggerUi.serve, swaggerUi.setup(spec));
     }
 
+    /**
+     * Sets up global error handling middleware.
+     */
     private setupErrorHandling(): void {
         this.app.use(errorHandler);
     }
 
+    /**
+     * Establishes the database connection.
+     */
     private connectDatabase(): void {
         connect()
             .then(() => {
@@ -120,6 +140,9 @@ class App {
             .catch((err) => logError(err));
     }
 
+    /**
+     * Handles process events for graceful shutdown.
+     */
     private handleProcessEvents(): void {
         process.on("SIGINT", async () => {
             await disconnect();
@@ -129,5 +152,5 @@ class App {
     }
 }
 
-// Avvio dell'applicazione
+// Start the application
 App.getInstance();

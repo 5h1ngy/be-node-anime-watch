@@ -1,9 +1,20 @@
 {
   "name": "be-node-anime-watch",
-  "version": "0.0.0",
-  "description": "",
+  "version": "1.0.0",
+  "description": "RESTful API for managing anime details, tags, and related metadata using Sequelize with SQLite.",
   "license": "MIT",
-  "keywords": [],
+  "keywords": [
+    "anime",
+    "api",
+    "anime-details",
+    "tags",
+    "sequelize",
+    "sqlite",
+    "restful",
+    "typescript",
+    "openapi",
+    "swagger"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/5h1ngy/be-node-anime-watch.git"
@@ -15,7 +26,7 @@
   "packageManager": "yarn@4.5.1",
   "type": "commonjs",
   "bin": {
-    "anime-services": "./dist/index.js"
+    "anime-api": "./dist/index.js"
   },
   "main": "dist/index.js",
   "scripts": {
@@ -54,7 +65,7 @@
     "@types/helmet": "^4.0.0",
     "@types/module-alias": "^2.0.4",
     "@types/morgan": "^1.9.9",
-    "@types/node": "^22.9.1",
+    "@types/node": "^22.9.3",
     "@types/swagger-jsdoc": "^6.0.4",
     "@types/swagger-ui-express": "^4.1.7",
     "@typescript-eslint/eslint-plugin": "^8.15.0",

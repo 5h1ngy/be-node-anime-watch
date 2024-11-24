@@ -1,6 +1,9 @@
 import { IsString, IsOptional, IsUUID, IsArray, ValidateNested, IsObject } from "class-validator";
 import { Type } from "class-transformer";
 
+/**
+ * DTO for representing image details.
+ */
 export class ImageDto {
   @IsUUID()
   id!: string | null;
@@ -10,6 +13,9 @@ export class ImageDto {
   thumbnail!: string | null;
 }
 
+/**
+ * DTO for representing tag details.
+ */
 export class TagDto {
   @IsUUID()
   id!: string | null;
@@ -19,6 +25,9 @@ export class TagDto {
   label!: string | null;
 }
 
+/**
+ * DTO for representing anime details.
+ */
 export class AnimeDetailsDto {
   @IsUUID()
   id!: string;
@@ -40,7 +49,8 @@ export class AnimeDetailsDto {
   tags!: Array<TagDto> | null;
 
   constructor(
-    id: string, title: string | null,
+    id: string,
+    title: string | null,
     type: string | null,
     image: ImageDto | null,
     tags: Array<TagDto> | null

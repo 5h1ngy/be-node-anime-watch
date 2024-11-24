@@ -1,4 +1,3 @@
-// src/services/AnimeDetailsService.ts
 import { Service } from "typedi";
 import { Op } from "sequelize";
 import TagDetails from "@/models/TagDetails";
@@ -6,11 +5,17 @@ import AnimeDetails from "@/models/AnimeDetails";
 import { TagDetailsDto } from "@/dtos/TagDetailsDto";
 import { AnimeDetailsDto } from "@/dtos/AnimeDetailsDto";
 
+/**
+ * Interface for simple result sets.
+ */
 export interface SimpleResult<T> {
   data: T[];
   total: number;
 }
 
+/**
+ * Interface for paginated result sets.
+ */
 export interface PaginatedResult<T> {
   data: T[];
   total: number;
@@ -19,23 +24,34 @@ export interface PaginatedResult<T> {
   totalPages: number;
 }
 
+/**
+ * Service for managing tag details.
+ */
 @Service()
 export class TagDetailsService {
-
+  /**
+   * Fetches all tag details in alphabetical order.
+   *
+   * @returns A list of tag details.
+   */
   async getAll(): Promise<SimpleResult<TagDetailsDto>> {
-
     const { rows, count: total } = await TagDetails.findAndCountAll({
       order: [["label", "ASC"]],
     });
 
-    const data = rows.map((tag) => new TagDetailsDto(
-      tag.id,
-      tag.label || null
-    ));
+    const data = rows.map((tag) => new TagDetailsDto(tag.id, tag.label || null));
 
     return { data, total };
   }
 
+  /**
+   * Searches tags by label and paginates associated anime details.
+   *
+   * @param label The label to search for.
+   * @param offset The page number (1-based).
+   * @param size The number of items per page.
+   * @returns Paginated anime details associated with matching tags.
+   */
   async searchByLabel(
     label: string,
     offset: number = 1,
@@ -47,13 +63,12 @@ export class TagDetailsService {
       order: [["label", "ASC"]],
     });
 
-    const totalAnimes = tags.reduce((sum, tag) => sum + (tag.animes?.length || 0), 0); // Totale degli anime
+    const totalAnimes = tags.reduce((sum, tag) => sum + (tag.animes?.length || 0), 0);
     const animeOffset = (offset - 1) * size;
 
     const paginatedAnimes: AnimeDetailsDto[] = [];
     let animeCount = 0;
 
-    // Costruisce gli anime paginati rispettando il limite
     for (const tag of tags) {
       for (const anime of tag.animes) {
         if (animeCount >= animeOffset && paginatedAnimes.length < size) {
@@ -73,16 +88,13 @@ export class TagDetailsService {
                 details.asset?.id
                   ? { id: details.asset.id, thumbnail: details.asset.thumbnail }
                   : null,
-                details.tags?.map((tag) => ({
-                  id: tag.id,
-                  label: tag.label,
-                })) || null
+                details.tags?.map((tag) => ({ id: tag.id, label: tag.label })) || null
               )
             );
           }
         }
         animeCount++;
-        if (paginatedAnimes.length >= size) break; // Fermati se hai raggiunto il limite
+        if (paginatedAnimes.length >= size) break;
       }
     }
 
