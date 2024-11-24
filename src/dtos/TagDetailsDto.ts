@@ -1,22 +1,18 @@
-import { IsString, IsOptional } from "class-validator";
-import { JSONSchema } from "class-validator-jsonschema";
+import { IsString, IsOptional, IsUUID } from "class-validator";
 
-@JSONSchema({
-    description: "DTO per TagDetails",
-})
 export class TagDetailsDto {
-    @IsString()
-    id!: string;
+  @IsUUID()
+  id!: string | null;
 
-    @IsString()
-    tagReference!: string;
+  @IsString()
+  @IsOptional()
+  label!: string | null;
 
-    @IsString()
-    label!: string;
-
-    constructor(id: string, tagReference: string, label: string) {
-        this.id = id;
-        this.tagReference = tagReference;
-        this.label = label;
-    }
+  constructor(
+    id: string,
+    label: string | null
+  ) {
+    this.id = id;
+    this.label = label;
+  }
 }

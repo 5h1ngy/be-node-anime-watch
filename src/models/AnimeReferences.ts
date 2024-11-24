@@ -6,6 +6,7 @@ import {
     PrimaryKey,
     HasOne,
 } from "sequelize-typescript";
+
 import AnimeDetails from "./AnimeDetails";
 
 /**

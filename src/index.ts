@@ -16,9 +16,7 @@ import { errorHandler } from "@/middleware/errorHandler";
 import { setupHttpLogging, logInfo, logError, logWarn } from "@/shared/logger";
 
 import { AnimeDetailsController } from "@/controllers/AnimeDetailsController";
-import { AssetImagesController } from "@/controllers/AssetImagesController";
 import { TagDetailsController } from "@/controllers/TagDetailsController";
-import { AnimeTagsController } from "@/controllers/AnimeTagsController";
 import { HealthController } from "@/controllers/HealthController";
 
 class App {
@@ -68,9 +66,7 @@ class App {
         useExpressServer(this.app, {
             controllers: [
                 AnimeDetailsController,
-                AssetImagesController,
                 TagDetailsController,
-                AnimeTagsController,
             ],
             defaultErrorHandler: false,
             routePrefix: "/api",
@@ -96,6 +92,9 @@ class App {
             },
             {
                 components: {
+                    /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */
+                    // @ts-ignore: Problema noto con OpenAPI e class-validator
+                    // @ts-expect-error
                     schemas,
                 },
                 info: {

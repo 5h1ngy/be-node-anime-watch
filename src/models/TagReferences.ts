@@ -5,6 +5,7 @@ import {
     DataType,
     HasOne,
 } from "sequelize-typescript";
+
 import TagDetails from "./TagDetails";
 
 /**

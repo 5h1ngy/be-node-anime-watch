@@ -7,6 +7,7 @@ import {
     BelongsTo,
     BelongsToMany,
 } from "sequelize-typescript";
+
 import AnimeReferences from "./AnimeReferences";
 import AssetImages from "./AssetImages";
 import TagDetails from "./TagDetails";
@@ -20,6 +21,7 @@ import AnimeTags from "./AnimeTags";
     timestamps: true, // Aggiunge automaticamente `createdAt` e `updatedAt`
 })
 export default class AnimeDetails extends Model {
+
     /**
      * Identificatore unico dell'anime.
      */

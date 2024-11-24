@@ -7,6 +7,7 @@ import {
     BelongsTo,
     BelongsToMany,
 } from "sequelize-typescript";
+
 import TagReferences from "./TagReferences";
 import AnimeTags from "./AnimeTags";
 import AnimeDetails from "./AnimeDetails";

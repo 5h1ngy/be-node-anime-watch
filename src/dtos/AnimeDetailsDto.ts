@@ -1,19 +1,54 @@
-import { IsString, IsOptional, IsUUID } from "class-validator";
+import { IsString, IsOptional, IsUUID, IsArray, ValidateNested, IsObject } from "class-validator";
+import { Type } from "class-transformer";
+
+export class ImageDto {
+  @IsUUID()
+  id!: string | null;
+
+  @IsString()
+  @IsOptional()
+  thumbnail!: string | null;
+}
+
+export class TagDto {
+  @IsUUID()
+  id!: string | null;
+
+  @IsString()
+  @IsOptional()
+  label!: string | null;
+}
 
 export class AnimeDetailsDto {
   @IsUUID()
   id!: string;
 
   @IsString()
-  type!: string;
+  title!: string | null;
 
   @IsString()
-  @IsOptional()
-  image?: string | null;
+  type!: string | null;
 
-  constructor(id: string, type: string, image: string | null) {
+  @ValidateNested()
+  @IsObject()
+  @Type(() => ImageDto)
+  image!: ImageDto | null;
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => TagDto)
+  tags!: Array<TagDto> | null;
+
+  constructor(
+    id: string, title: string | null,
+    type: string | null,
+    image: ImageDto | null,
+    tags: Array<TagDto> | null
+  ) {
     this.id = id;
+    this.title = title;
     this.type = type;
     this.image = image;
+    this.tags = tags;
   }
 }

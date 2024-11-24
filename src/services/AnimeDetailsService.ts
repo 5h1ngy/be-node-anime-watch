@@ -1,8 +1,7 @@
-// src/services/AnimeDetailsService.ts
-import AnimeDetails from "@/models/AnimeDetails";
-import { AnimeDetailsDto } from "@/dtos/AnimeDetailsDto";
 import { Service } from "typedi";
 import { Op } from "sequelize";
+import AnimeDetails from "@/models/AnimeDetails";
+import { AnimeDetailsDto } from "@/dtos/AnimeDetailsDto";
 
 export interface PaginatedResult<T> {
   data: T[];
@@ -14,50 +13,51 @@ export interface PaginatedResult<T> {
 
 @Service()
 export class AnimeDetailsService {
-  // Metodo esistente per ottenere tutti gli anime
-  async getAll(page: number = 1, limit: number = 10): Promise<PaginatedResult<AnimeDetailsDto>> {
-    const offset = (page - 1) * limit;
+
+  async getAll(offset: number = 1, size: number = 10): Promise<PaginatedResult<AnimeDetailsDto>> {
+
     const { rows, count: total } = await AnimeDetails.findAndCountAll({
-      offset,
-      limit,
-      include: [{ association: "asset", required: false }],
+      offset: (offset - 1) * size, limit: size,
+      include: [
+        { association: "asset", required: false },
+        { association: "tags", required: false },
+      ],
     });
 
-    const data = rows.map(
-      (anime) => new AnimeDetailsDto(anime.id, anime.type || "Unknown", anime.asset?.thumbnail || null)
-    );
-    const totalPages = Math.ceil(total / limit);
+    const data = rows.map((anime) => new AnimeDetailsDto(
+      anime.id,
+      anime.title || null,
+      anime.type || null,
+      anime.asset?.id ? { id: anime.asset?.id, thumbnail: anime.asset?.thumbnail } : null,
+      anime.tags?.map(tag => ({ id: tag.id, label: tag.label })) || null
+    ));
 
-    return { data, total, page, limit, totalPages };
+    const totalPages = Math.ceil(total / size);
+
+    return { data, total, page: offset, limit: size, totalPages };
   }
 
-  // Nuovo metodo per ottenere un anime per ID
-  async getById(id: string): Promise<AnimeDetailsDto | null> {
-    const anime = await AnimeDetails.findByPk(id, { include: [{ association: "asset" }] });
-    if (!anime) return null;
+  async searchByTitle(title: string, offset: number = 1, size: number = 10): Promise<PaginatedResult<AnimeDetailsDto>> {
 
-    return new AnimeDetailsDto(anime.id, anime.type || "Unknown", anime.asset?.thumbnail || null);
-  }
-
-  // Nuovo metodo per cercare anime per titolo
-  async searchByTitle(title: string, page: number = 1, limit: number = 10): Promise<PaginatedResult<AnimeDetailsDto>> {
-    const offset = (page - 1) * limit;
     const { rows, count: total } = await AnimeDetails.findAndCountAll({
-      where: {
-        title: {
-          [Op.like]: `%${title}%`,
-        },
-      },
-      offset,
-      limit,
-      include: [{ association: "asset", required: false }],
+      where: { title: { [Op.like]: `%${title}%`, } },
+      offset: (offset - 1) * size, limit: size,
+      include: [
+        { association: "asset", required: false },
+        { association: "tags", required: false }
+      ],
     });
 
-    const data = rows.map(
-      (anime) => new AnimeDetailsDto(anime.id, anime.type || "Unknown", anime.asset?.thumbnail || null)
-    );
-    const totalPages = Math.ceil(total / limit);
+    const data = rows.map((anime) => new AnimeDetailsDto(
+      anime.id,
+      anime.title || null,
+      anime.type || null,
+      anime.asset?.id ? { id: anime.asset?.id, thumbnail: anime.asset?.thumbnail } : null,
+      anime.tags?.map(tag => ({ id: tag.id, label: tag.label })) || null
+    ));
 
-    return { data, total, page, limit, totalPages };
+    const totalPages = Math.ceil(total / size);
+
+    return { data, total, page: offset, limit: size, totalPages };
   }
 }
