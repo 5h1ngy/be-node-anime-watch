@@ -1,53 +1,53 @@
-import path from "path";
-import { Sequelize } from "sequelize-typescript";
+import path from 'path';
+import { Sequelize } from 'sequelize-typescript';
+
 import AnimeDetails from "@/models/AnimeDetails";
+import AnimeDescriptions from "@/models/AnimeDescriptions";
 import AnimeReferences from "@/models/AnimeReferences";
 import TagDetails from "@/models/TagDetails";
 import TagReferences from "@/models/TagReferences";
 import AssetImages from "@/models/AssetImages";
 import AnimeTags from "@/models/AnimeTags";
-import { logVerbose, logWarn, logError } from "@/shared/logger";
+import { logWarn, logVerbose } from "@/shared/logger";
 
-// Configura Sequelize per SQLite
+/**
+ * Configura l'istanza Sequelize per la gestione del database SQLite.
+ */
 const sequelize = new Sequelize({
-    dialect: "sqlite",
+    dialect: 'sqlite',
     storage: process.env.NODE_ENV === "development"
-        ? path.resolve(__dirname, "..", "..", "data", process.env.STORAGE_FILE || "db_dump.db")
-        : path.resolve(process.cwd(), "data", process.env.STORAGE_FILE || "db_dump.db"),
-    logging: process.env.LOGGING_DB === "true" ? logVerbose : false,
-    models: [AnimeDetails, AnimeReferences, TagDetails, TagReferences, AssetImages, AnimeTags],
+        ? path.resolve(__dirname, "..", "..", "data", process.env.STORAGE_FILE || 'db_dump.db')
+        : path.resolve(process.cwd(), "data", process.env.STORAGE_FILE || 'db_dump.db'),
+    logging: process.env.LOGGING_DB === "true" ? logVerbose : false || false,
+    models: [AnimeDetails, AnimeDescriptions, AnimeReferences, TagDetails, TagReferences, AssetImages, AnimeTags],
 });
 
-// Connetti al database
+/**
+ * Funzione per connettersi al database.
+ * @throws Lancia un errore se la connessione al database fallisce.
+ */
 export async function connect() {
     try {
         await sequelize.authenticate();
-        logWarn("Database connection established successfully.");
+        console.log("Connection has been established successfully.");
         await sequelize.sync();
-        logWarn("Database synchronized.");
+        logWarn("Database synchronized successfully!");
     } catch (error) {
-        if (error instanceof Error) {
-            logError(`Database connection error: ${error.message}`);
-        } else {
-            logError("Unknown database connection error.");
-        }
-        throw error; // Rilancia l'errore per la gestione a monte
+        console.error("Error synchronizing database:", error);
+        throw error;
     }
 }
 
-// Disconnetti dal database
+/**
+ * Funzione per disconnettersi dal database.
+ * @throws Lancia un errore se la disconnessione dal database fallisce.
+ */
 export async function disconnect() {
     try {
         await sequelize.close();
-        logWarn("Database connection closed.");
+        logWarn("Database close");
     } catch (error) {
-        if (error instanceof Error) {
-            logError(`Database disconnection error: ${error.message}`);
-        } else {
-            logError("Unknown database disconnection error.");
-        }
-        throw error; // Rilancia l'errore per la gestione a monte
+        console.error("Error synchronizing database:", error);
+        throw error;
     }
 }
-
-export default sequelize;

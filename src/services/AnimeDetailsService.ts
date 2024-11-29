@@ -33,6 +33,7 @@ export class AnimeDetailsService {
       include: [
         { association: "asset", required: false },
         { association: "tags", required: false },
+        { association: "description", required: false },
       ],
     });
 
@@ -45,7 +46,8 @@ export class AnimeDetailsService {
           anime.asset?.id
             ? { id: anime.asset.id, thumbnail: anime.asset.thumbnail }
             : null,
-          anime.tags?.map((tag) => ({ id: tag.id, label: tag.label })) || null
+          anime.tags?.map((tag) => ({ id: tag.id, label: tag.label })) || null,
+          anime.description?.raw || null
         )
     );
 
@@ -70,6 +72,7 @@ export class AnimeDetailsService {
       include: [
         { association: "asset", required: false },
         { association: "tags", required: false },
+        { association: "description", required: false },
       ],
     });
 
@@ -79,10 +82,9 @@ export class AnimeDetailsService {
           anime.id,
           anime.title || null,
           anime.type || null,
-          anime.asset?.id
-            ? { id: anime.asset.id, thumbnail: anime.asset.thumbnail }
-            : null,
-          anime.tags?.map((tag) => ({ id: tag.id, label: tag.label })) || null
+          anime.asset?.id ? { id: anime.asset.id, thumbnail: anime.asset.thumbnail } : null,
+          anime.tags?.map((tag) => ({ id: tag.id, label: tag.label })) || null,
+          anime.description?.raw || null
         )
     );
 

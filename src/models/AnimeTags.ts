@@ -5,7 +5,6 @@ import {
     DataType,
     ForeignKey,
 } from "sequelize-typescript";
-
 import AnimeDetails from "./AnimeDetails";
 import TagDetails from "./TagDetails";
 

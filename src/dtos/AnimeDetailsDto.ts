@@ -48,17 +48,22 @@ export class AnimeDetailsDto {
   @Type(() => TagDto)
   tags!: Array<TagDto> | null;
 
+  @IsString()
+  description!: string | null;
+
   constructor(
     id: string,
     title: string | null,
     type: string | null,
     image: ImageDto | null,
-    tags: Array<TagDto> | null
+    tags: Array<TagDto> | null,
+    description: string | null
   ) {
     this.id = id;
     this.title = title;
     this.type = type;
     this.image = image;
     this.tags = tags;
+    this.description = description;
   }
 }
