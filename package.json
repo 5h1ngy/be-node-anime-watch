@@ -19,6 +19,7 @@
     "type": "git",
     "url": "https://github.com/5h1ngy/be-node-anime-watch.git"
   },
+  "author": "5h1ngy",
   "engines": {
     "node": ">=20.18.0",
     "yarn": ">=4.5.1"
