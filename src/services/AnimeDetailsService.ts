@@ -7,7 +7,7 @@ import { AnimeDetailsDto } from "@/dtos/AnimeDetailsDto";
  * Interface for paginated results.
  */
 export interface PaginatedResult<T> {
-  data: T[];
+  occurrences: T[];
   total: number;
   page: number;
   limit: number;
@@ -37,7 +37,7 @@ export class AnimeDetailsService {
       ],
     });
 
-    const data = rows.map(
+    const occurrences = rows.map(
       (anime) =>
         new AnimeDetailsDto(
           anime.id,
@@ -53,7 +53,7 @@ export class AnimeDetailsService {
 
     const totalPages = Math.ceil(total / size);
 
-    return { data, total, page: offset, limit: size, totalPages };
+    return { occurrences, total, page: offset, limit: size, totalPages };
   }
 
   /**
@@ -76,7 +76,7 @@ export class AnimeDetailsService {
       ],
     });
 
-    const data = rows.map(
+    const occurrences = rows.map(
       (anime) =>
         new AnimeDetailsDto(
           anime.id,
@@ -90,6 +90,6 @@ export class AnimeDetailsService {
 
     const totalPages = Math.ceil(total / size);
 
-    return { data, total, page: offset, limit: size, totalPages };
+    return { occurrences, total, page: offset, limit: size, totalPages };
   }
 }

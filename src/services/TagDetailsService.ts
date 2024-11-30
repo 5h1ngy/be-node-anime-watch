@@ -9,7 +9,7 @@ import { AnimeDetailsDto } from "@/dtos/AnimeDetailsDto";
  * Interface for simple result sets.
  */
 export interface SimpleResult<T> {
-  data: T[];
+  occurrences: T[];
   total: number;
 }
 
@@ -17,7 +17,7 @@ export interface SimpleResult<T> {
  * Interface for paginated result sets.
  */
 export interface PaginatedResult<T> {
-  data: T[];
+  occurrences: T[];
   total: number;
   page: number;
   limit: number;
@@ -39,9 +39,9 @@ export class TagDetailsService {
       order: [["label", "ASC"]],
     });
 
-    const data = rows.map((tag) => new TagDetailsDto(tag.id, tag.label || null));
+    const occurrences = rows.map((tag) => new TagDetailsDto(tag.id, tag.label || null));
 
-    return { data, total };
+    return { occurrences, total };
   }
 
   /**
@@ -76,6 +76,7 @@ export class TagDetailsService {
             include: [
               { association: "asset", required: false },
               { association: "tags", required: false },
+              { association: "description", required: false },
             ],
           });
 
@@ -88,7 +89,8 @@ export class TagDetailsService {
                 details.asset?.id
                   ? { id: details.asset.id, thumbnail: details.asset.thumbnail }
                   : null,
-                details.tags?.map((tag) => ({ id: tag.id, label: tag.label })) || null
+                details.tags?.map((tag) => ({ id: tag.id, label: tag.label })) || null,
+                anime.description?.raw || null
               )
             );
           }
@@ -101,7 +103,7 @@ export class TagDetailsService {
     const totalPages = Math.ceil(totalAnimes / size);
 
     return {
-      data: paginatedAnimes,
+      occurrences: paginatedAnimes,
       total: totalAnimes,
       page: offset,
       limit: size,
