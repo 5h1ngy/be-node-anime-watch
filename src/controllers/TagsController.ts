@@ -1,17 +1,19 @@
-import { JsonController, Get, QueryParam } from "routing-controllers";
+import { JsonController, Get, QueryParam, Param } from "routing-controllers";
 import { Inject, Service } from "typedi";
-import { TagDetailsService } from "@/services/TagDetailsService";
-import { PaginatedResult, SimpleResult } from "@/services/TagDetailsService";
-import { TagDetailsDto } from "@/dtos/TagDetailsDto";
-import { AnimeDetailsDto } from "@/dtos/AnimeDetailsDto";
+
 import { logInfo } from "@/shared/logger";
+import { TagDetailsService } from "@/services/TagDetailsService";
+
+import { TagDetailsDto } from "@/dtos/TagDetailsDto";
+import { AnimeNewestDto } from "@/dtos/AnimeNewestDto";
+import { PaginatedResultDto } from "@/dtos/ResultDto";
 
 /**
  * Controller for managing tag details.
  */
 @Service()
-@JsonController("/tag-details")
-export class TagDetailsController {
+@JsonController("/tag")
+export class TagController {
   constructor(
     @Inject()
     private tagDetailsService: TagDetailsService
@@ -20,12 +22,17 @@ export class TagDetailsController {
   /**
    * Fetches all tags.
    * 
+   * @param offset The pagination offset.
+   * @param size The pagination size.
    * @returns A list of tag details.
    */
   @Get("/")
-  async getAll(): Promise<SimpleResult<TagDetailsDto>> {
-    logInfo(`Fetching all tag details`);
-    return await this.tagDetailsService.getAll();
+  async getAll(
+    @QueryParam("offset", { required: false }) offset: number = 1,
+    @QueryParam("size", { required: false }) size: number = 10
+  ): Promise<PaginatedResultDto<TagDetailsDto>> {
+    logInfo(`Fetching all tag details - Offset: ${offset}, Size: ${size}`);
+    return await this.tagDetailsService.getAll(offset, size);
   }
 
   /**
@@ -36,12 +43,12 @@ export class TagDetailsController {
    * @param size The pagination size.
    * @returns Paginated anime details associated with the tag.
    */
-  @Get("/search")
+  @Get("/search/:label")
   async searchByLabel(
-    @QueryParam("label") label: string,
+    @Param("label") label: string,
     @QueryParam("offset", { required: false }) offset: number = 1,
     @QueryParam("size", { required: false }) size: number = 10
-  ): Promise<PaginatedResult<AnimeDetailsDto>> {
+  ): Promise<PaginatedResultDto<AnimeNewestDto>> {
     logInfo(`Searching anime by tag label - Label: "${label}"`);
     return await this.tagDetailsService.searchByLabel(label, offset, size);
   }

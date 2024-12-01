@@ -15,8 +15,8 @@ import { connect, disconnect } from "@/config/database";
 import { errorHandler } from "@/middleware/errorHandler";
 import { setupHttpLogging, logInfo, logError, logWarn } from "@/shared/logger";
 
-import { AnimeDetailsController } from "@/controllers/AnimeDetailsController";
-import { TagDetailsController } from "@/controllers/TagDetailsController";
+import { AnimeController } from "@/controllers/AnimeController";
+import { TagController } from "@/controllers/TagsController";
 import { HealthController } from "@/controllers/HealthController";
 
 /**
@@ -77,8 +77,8 @@ class App {
     private setupControllers(): void {
         useExpressServer(this.app, {
             controllers: [
-                AnimeDetailsController,
-                TagDetailsController,
+                AnimeController,
+                TagController,
             ],
             defaultErrorHandler: false,
             routePrefix: "/api",

@@ -3,26 +3,8 @@ import { Op } from "sequelize";
 import TagDetails from "@/models/TagDetails";
 import AnimeDetails from "@/models/AnimeDetails";
 import { TagDetailsDto } from "@/dtos/TagDetailsDto";
-import { AnimeDetailsDto } from "@/dtos/AnimeDetailsDto";
-
-/**
- * Interface for simple result sets.
- */
-export interface SimpleResult<T> {
-  occurrences: T[];
-  total: number;
-}
-
-/**
- * Interface for paginated result sets.
- */
-export interface PaginatedResult<T> {
-  occurrences: T[];
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-}
+import { AnimeNewestDto } from "@/dtos/AnimeNewestDto";
+import { PaginatedResultDto } from "@/dtos/ResultDto";
 
 /**
  * Service for managing tag details.
@@ -32,16 +14,24 @@ export class TagDetailsService {
   /**
    * Fetches all tag details in alphabetical order.
    *
-   * @returns A list of tag details.
+   * @param offset The page number (1-based).
+   * @param size The number of items per page.
+   * @returns Paginated anime details.
    */
-  async getAll(): Promise<SimpleResult<TagDetailsDto>> {
+  async getAll(offset: number = 1, size: number = 10): Promise<PaginatedResultDto<TagDetailsDto>> {
+
     const { rows, count: total } = await TagDetails.findAndCountAll({
+      offset: (offset - 1) * size,
+      limit: size,
       order: [["label", "ASC"]],
     });
 
     const occurrences = rows.map((tag) => new TagDetailsDto(tag.id, tag.label || null));
 
-    return { occurrences, total };
+    // Calcola il numero totale di pagine
+    const totalPages = Math.ceil(total / size);
+
+    return new PaginatedResultDto<TagDetailsDto>(occurrences, total, offset, size, totalPages);
   }
 
   /**
@@ -52,11 +42,8 @@ export class TagDetailsService {
    * @param size The number of items per page.
    * @returns Paginated anime details associated with matching tags.
    */
-  async searchByLabel(
-    label: string,
-    offset: number = 1,
-    size: number = 10
-  ): Promise<PaginatedResult<AnimeDetailsDto>> {
+  async searchByLabel(label: string, offset: number = 1, size: number = 10): Promise<PaginatedResultDto<AnimeNewestDto>> {
+
     const tags = await TagDetails.findAll({
       where: { label: { [Op.like]: `%${label}%` } },
       include: [{ association: "animes", required: false }],
@@ -66,7 +53,7 @@ export class TagDetailsService {
     const totalAnimes = tags.reduce((sum, tag) => sum + (tag.animes?.length || 0), 0);
     const animeOffset = (offset - 1) * size;
 
-    const paginatedAnimes: AnimeDetailsDto[] = [];
+    const paginatedAnimes: AnimeNewestDto[] = [];
     let animeCount = 0;
 
     for (const tag of tags) {
@@ -74,23 +61,19 @@ export class TagDetailsService {
         if (animeCount >= animeOffset && paginatedAnimes.length < size) {
           const details = await AnimeDetails.findByPk(anime.id, {
             include: [
-              { association: "asset", required: false },
-              { association: "tags", required: false },
-              { association: "description", required: false },
+              { association: "asset", required: false }
             ],
           });
 
           if (details) {
             paginatedAnimes.push(
-              new AnimeDetailsDto(
+              new AnimeNewestDto(
                 details.id,
                 details.title || null,
                 details.type || null,
                 details.asset?.id
                   ? { id: details.asset.id, thumbnail: details.asset.thumbnail }
-                  : null,
-                details.tags?.map((tag) => ({ id: tag.id, label: tag.label })) || null,
-                anime.description?.raw || null
+                  : null
               )
             );
           }
@@ -102,12 +85,6 @@ export class TagDetailsService {
 
     const totalPages = Math.ceil(totalAnimes / size);
 
-    return {
-      occurrences: paginatedAnimes,
-      total: totalAnimes,
-      page: offset,
-      limit: size,
-      totalPages,
-    };
+    return new PaginatedResultDto<AnimeNewestDto>(paginatedAnimes, totalAnimes, offset, size, totalPages);
   }
 }
