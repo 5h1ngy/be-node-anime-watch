@@ -12,11 +12,7 @@
 
 A simple API for managing anime details, tags, and assets, built with Node.js and TypeScript. It is designed to be lightweight, fast, and easy to use for developers seeking to integrate anime-related data into their projects.
 
----
-
 ![be-node-anime-watch Demo](./assets/thumbnail.png) <!-- Placeholder: Replace with actual image -->
-
----
 
 ## **Features**
 
@@ -31,8 +27,6 @@ A simple API for managing anime details, tags, and assets, built with Node.js an
   ✅ Structured logging using **Winston**.  
   ✅ OpenAPI documentation using **routing-controllers-openapi** and Swagger.  
   ✅ Robust environment configuration via `.env`.
-
----
 
 ## **Installation**
 
@@ -69,8 +63,6 @@ Make sure you have the following installed:
    LOG_DEFAULT_LEVEL=info
    ```
 
----
-
 ## **Usage**
 
 ### Development Mode
@@ -103,8 +95,6 @@ By default, the API will:
 - Serve anime-related data from the SQLite database.
 - Expose endpoints for anime details and tags.
 
----
-
 ## **Endpoints**
 
 ### Base URL
@@ -126,8 +116,6 @@ http://localhost:3000/api
 
 Refer to the [Swagger documentation](http://localhost:3000/docs) for the complete API reference.
 
----
-
 ## **Project Structure**
 
 ```
@@ -141,8 +129,6 @@ src/
 ├── shared/         # Shared utilities like logging
 ├── index.ts        # Main entry point
 ```
-
----
 
 ## **Logging**
 
@@ -162,8 +148,6 @@ Example Log:
 [2024-11-21 14:30:10] verbose: Executing SQL: SELECT * FROM anime_details LIMIT 10;
 ```
 
----
-
 ## **Documentation**
 
 Generate TypeScript documentation with **Typedoc**:
@@ -174,15 +158,11 @@ yarn docs
 
 The documentation will be saved in the `docs/` directory.
 
----
-
 ## **Database**
 
 - **Database**: SQLite
 - **Database File**: Configurable via the `STORAGE_FILE` environment variable.
 - **Sequelize**: Used for ORM and migrations.
-
----
 
 ## **License and Data Attribution**
 
@@ -203,13 +183,9 @@ For full details, visit the official license page: [https://creativecommons.org/
 
 AniDB is the original source of the data. For more information, visit [https://anidb.net](https://anidb.net).
 
----
-
 ## **Author**
 
 Project created by 5h1ngy.
-
----
 
 ## **License**
 
