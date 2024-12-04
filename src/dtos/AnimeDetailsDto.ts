@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsUUID, IsArray, ValidateNested, IsObject } from "class-validator";
+import { IsString, IsOptional, IsUUID, IsArray, ValidateNested, IsObject, IsNumber } from "class-validator";
 import { Type } from "class-transformer";
 
 /**
@@ -38,6 +38,18 @@ export class AnimeDetailsDto {
   @IsString()
   type!: string | null;
 
+  @IsNumber()
+  episodes!: number | null;
+
+  @IsString()
+  season!: string | null;
+
+  @IsNumber()
+  year_start!: number | null;
+
+  @IsNumber()
+  year_end!: number | null;
+
   @ValidateNested()
   @IsObject()
   @Type(() => ImageDto)
@@ -55,6 +67,10 @@ export class AnimeDetailsDto {
     id: string,
     title: string | null,
     type: string | null,
+    episodes: number | null,
+    season: string | null,
+    year_start: number | null,
+    year_end: number | null,
     image: ImageDto | null,
     tags: Array<TagDto> | null,
     description: string | null
@@ -62,6 +78,10 @@ export class AnimeDetailsDto {
     this.id = id;
     this.title = title;
     this.type = type;
+    this.episodes = episodes;
+    this.season = season;
+    this.year_start = year_start;
+    this.year_end = year_end;
     this.image = image;
     this.tags = tags;
     this.description = description;

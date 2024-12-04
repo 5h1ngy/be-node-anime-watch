@@ -3,6 +3,7 @@ import AnimeDetails from "@/models/AnimeDetails";
 import { AnimeNewestDto } from "@/dtos/AnimeNewestDto";
 import { AnimeDetailsDto } from "@/dtos/AnimeDetailsDto";
 import { SimpleResultDto, PaginatedResultDto } from "@/dtos/ResultDto";
+import { Sequelize } from "sequelize";
 
 
 /**
@@ -26,6 +27,21 @@ export class AnimeService {
       include: [
         { association: "asset", required: false },
       ],
+      order: [
+        ["year_start", "DESC NULLS LAST"],
+        [
+          Sequelize.literal(`
+              CASE
+                  WHEN season = 'winter' THEN 1
+                  WHEN season = 'spring' THEN 2
+                  WHEN season = 'summer' THEN 3
+                  WHEN season = 'autumn' THEN 4
+                  ELSE 5
+              END
+          `),
+          "DESC" // Ordina le stagioni in ordine specificato
+        ],
+      ],
     });
 
     // Mappa le righe in un array di DTO
@@ -33,6 +49,8 @@ export class AnimeService {
       anime.id,
       anime.title || null,
       anime.type || null,
+      anime.season || null,
+      anime.year_start || null,
       anime.asset?.id
         ? { id: anime.asset.id, thumbnail: anime.asset.thumbnail }
         : null
@@ -67,6 +85,10 @@ export class AnimeService {
         anime.id,
         anime.title || null,
         anime.type || null,
+        anime.episodes || null,
+        anime.season || null,
+        anime.year_start || null,
+        anime.year_end || null,
         anime.asset?.id ? { id: anime.asset.id, thumbnail: anime.asset.thumbnail } : null,
         anime.tags?.map((tag) => ({ id: tag.id, label: tag.label })) || null,
         anime.description?.raw || null
