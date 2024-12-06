@@ -1,10 +1,10 @@
-import { JsonController, Get, QueryParam, Param } from "routing-controllers";
+import { JsonController, Get, QueryParam, Param, BodyParam, Post } from "routing-controllers";
 import { Inject, Service } from "typedi";
 import { logInfo } from "@/shared/logger";
 import { AnimeService } from "@/services/AnimeService";
-import { AnimeNewestDto } from "@/dtos/AnimeNewestDto";
+import { AnimeDto } from "@/dtos/AnimeDto";
 import { AnimeDetailsDto } from "@/dtos/AnimeDetailsDto";
-import { SimpleResultDto, PaginatedResultDto } from "@/dtos/ResultDto";
+import { SimpleResultDto, SimpleResultsDto, PaginatedResultDto } from "@/dtos/ResultDto";
 
 /**
  * Controller for managing anime details.
@@ -24,13 +24,28 @@ export class AnimeController {
    * @param size The pagination size.
    * @returns Paginated anime details.
    */
-  @Get("/newest")
-  async getNewest(
+  @Get("/")
+  async getAll(
     @QueryParam("offset", { required: false }) offset: number = 1,
     @QueryParam("size", { required: false }) size: number = 10
-  ): Promise<PaginatedResultDto<AnimeNewestDto>> {
-    logInfo(`Fetching all anime details - Offset: ${offset}, Size: ${size}`);
-    return await this.animeService.getNewest(offset, size);
+  ): Promise<PaginatedResultDto<AnimeDto>> {
+    logInfo(`Fetching all anime - Offset: ${offset}, Size: ${size}`);
+    return await this.animeService.getAll(offset, size);
+  }
+
+  /**
+ * Fetches all anime details with pagination.
+ * 
+ * @param offset The pagination offset.
+ * @param size The pagination size.
+ * @returns Paginated anime details.
+ */
+  @Post("/")
+  async getAllByIds(
+    @BodyParam("ids", { required: true }) ids: string[],
+  ): Promise<SimpleResultsDto<AnimeDto[]>> {
+    logInfo(`Fetching all anime by ids`);
+    return await this.animeService.getByIds(ids);
   }
 
 

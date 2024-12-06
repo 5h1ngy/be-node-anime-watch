@@ -5,7 +5,7 @@ import { ImageDto } from './AnimeDetailsDto'
 /**
  * DTO for representing anime details.
  */
-export class AnimeNewestDto {
+export class AnimeDto {
   @IsUUID()
   id!: string;
 

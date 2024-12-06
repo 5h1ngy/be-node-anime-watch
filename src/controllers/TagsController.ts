@@ -5,7 +5,7 @@ import { logInfo } from "@/shared/logger";
 import { TagDetailsService } from "@/services/TagDetailsService";
 
 import { TagDetailsDto } from "@/dtos/TagDetailsDto";
-import { AnimeNewestDto } from "@/dtos/AnimeNewestDto";
+import { AnimeDto } from "@/dtos/AnimeDto";
 import { PaginatedResultDto } from "@/dtos/ResultDto";
 
 /**
@@ -48,7 +48,7 @@ export class TagController {
     @Param("label") label: string,
     @QueryParam("offset", { required: false }) offset: number = 1,
     @QueryParam("size", { required: false }) size: number = 10
-  ): Promise<PaginatedResultDto<AnimeNewestDto>> {
+  ): Promise<PaginatedResultDto<AnimeDto>> {
     logInfo(`Searching anime by tag label - Label: "${label}"`);
     return await this.tagDetailsService.searchByLabel(label, offset, size);
   }

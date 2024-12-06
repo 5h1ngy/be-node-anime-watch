@@ -14,6 +14,18 @@ export class SimpleResultDto<T> {
 }
 
 /**
+ * DTO for representing simple result sets.
+ */
+export class SimpleResultsDto<T> {
+  @Type(() => Object) // Replace Object with the specific DTO class when used
+  occurrences!: T;
+
+  constructor(occurrences: T) {
+    this.occurrences = occurrences;
+  }
+}
+
+/**
  * DTO for representing paginated result sets.
  */
 export class PaginatedResultDto<T> {

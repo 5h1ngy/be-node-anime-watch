@@ -3,7 +3,7 @@ import { Op } from "sequelize";
 import TagDetails from "@/models/TagDetails";
 import AnimeDetails from "@/models/AnimeDetails";
 import { TagDetailsDto } from "@/dtos/TagDetailsDto";
-import { AnimeNewestDto } from "@/dtos/AnimeNewestDto";
+import { AnimeDto } from "@/dtos/AnimeDto";
 import { PaginatedResultDto } from "@/dtos/ResultDto";
 
 /**
@@ -42,7 +42,7 @@ export class TagDetailsService {
    * @param size The number of items per page.
    * @returns Paginated anime details associated with matching tags.
    */
-  async searchByLabel(label: string, offset: number = 1, size: number = 10): Promise<PaginatedResultDto<AnimeNewestDto>> {
+  async searchByLabel(label: string, offset: number = 1, size: number = 10): Promise<PaginatedResultDto<AnimeDto>> {
 
     const tags = await TagDetails.findAll({
       where: { label: { [Op.like]: `%${label}%` } },
@@ -53,7 +53,7 @@ export class TagDetailsService {
     const totalAnimes = tags.reduce((sum, tag) => sum + (tag.animes?.length || 0), 0);
     const animeOffset = (offset - 1) * size;
 
-    const paginatedAnimes: AnimeNewestDto[] = [];
+    const paginatedAnimes: AnimeDto[] = [];
     let animeCount = 0;
 
     for (const tag of tags) {
@@ -67,7 +67,7 @@ export class TagDetailsService {
 
           if (details) {
             paginatedAnimes.push(
-              new AnimeNewestDto(
+              new AnimeDto(
                 details.id,
                 details.title || null,
                 details.type || null,
@@ -85,6 +85,6 @@ export class TagDetailsService {
 
     const totalPages = Math.ceil(totalAnimes / size);
 
-    return new PaginatedResultDto<AnimeNewestDto>(paginatedAnimes, totalAnimes, offset, size, totalPages);
+    return new PaginatedResultDto<AnimeDto>(paginatedAnimes, totalAnimes, offset, size, totalPages);
   }
 }

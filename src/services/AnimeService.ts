@@ -1,8 +1,8 @@
 import { Service } from "typedi";
 import AnimeDetails from "@/models/AnimeDetails";
-import { AnimeNewestDto } from "@/dtos/AnimeNewestDto";
+import { AnimeDto } from "@/dtos/AnimeDto";
 import { AnimeDetailsDto } from "@/dtos/AnimeDetailsDto";
-import { SimpleResultDto, PaginatedResultDto } from "@/dtos/ResultDto";
+import { SimpleResultDto, SimpleResultsDto, PaginatedResultDto } from "@/dtos/ResultDto";
 import { Sequelize } from "sequelize";
 
 
@@ -18,7 +18,7 @@ export class AnimeService {
    * @param size The number of items per page.
    * @returns Paginated anime details.
    */
-  async getNewest(offset: number = 1, size: number = 10): Promise<PaginatedResultDto<AnimeNewestDto>> {
+  async getAll(offset: number = 1, size: number = 10): Promise<PaginatedResultDto<AnimeDto>> {
 
     // Trova righe e conteggio totale dal database
     const { rows, count: total } = await AnimeDetails.findAndCountAll({
@@ -45,7 +45,7 @@ export class AnimeService {
     });
 
     // Mappa le righe in un array di DTO
-    const occurrences = rows.map((anime) => new AnimeNewestDto(
+    const occurrences = rows.map((anime) => new AnimeDto(
       anime.id,
       anime.title || null,
       anime.type || null,
@@ -60,7 +60,58 @@ export class AnimeService {
     const totalPages = Math.ceil(total / size);
 
     // Inizializza e restituisci un'istanza del DTO paginato
-    return new PaginatedResultDto<AnimeNewestDto>(occurrences, total, offset, size, totalPages);
+    return new PaginatedResultDto<AnimeDto>(occurrences, total, offset, size, totalPages);
+  }
+
+  /**
+ * Fetches all anime details with pagination.
+ *
+ * @param ids The ids array.
+ * @param offset The page number (1-based).
+ * @param size The number of items per page.
+ * @returns Paginated anime details.
+ */
+  async getByIds(ids: Array<string>): Promise<SimpleResultsDto<AnimeDto[]>> {
+
+    // Trova righe e conteggio totale dal database
+    const { rows, count: total } = await AnimeDetails.findAndCountAll({
+      where: {
+        id: ids
+      },
+      include: [
+        { association: "asset", required: false },
+      ],
+      order: [
+        ["year_start", "DESC NULLS LAST"],
+        [
+          Sequelize.literal(`
+                CASE
+                    WHEN season = 'winter' THEN 1
+                    WHEN season = 'spring' THEN 2
+                    WHEN season = 'summer' THEN 3
+                    WHEN season = 'autumn' THEN 4
+                    ELSE 5
+                END
+            `),
+          "DESC" // Ordina le stagioni in ordine specificato
+        ],
+      ],
+    });
+
+    // Mappa le righe in un array di DTO
+    const occurrences = rows.map((anime) => new AnimeDto(
+      anime.id,
+      anime.title || null,
+      anime.type || null,
+      anime.season || null,
+      anime.year_start || null,
+      anime.asset?.id
+        ? { id: anime.asset.id, thumbnail: anime.asset.thumbnail }
+        : null
+    ));
+
+    // Inizializza e restituisci un'istanza del DTO paginato
+    return new SimpleResultsDto<AnimeDto[]>(occurrences);
   }
 
   /**
