@@ -1,7 +1,7 @@
 /**
  * Script per:
  *   1) Installare dipendenze in produzione con Yarn + check-cache (su Windows)
- *   2) Comprimere i file/folder in "be-node-portfolio.zip"
+ *   2) Comprimere i file/folder in "be-node-anime-watch.zip"
  *
  * Per eseguirlo:
  *   yarn pack:prod
@@ -53,8 +53,8 @@ function main() {
             fs.mkdirSync(buildDir, { recursive: true });
         }
 
-        // Creiamo lo stream di output verso lo zip "be-node-portfolio.zip"
-        const output = fs.createWriteStream(path.join(buildDir, "be-node-portfolio.zip"));
+        // Creiamo lo stream di output verso lo zip "be-node-anime-watch.zip"
+        const output = fs.createWriteStream(path.join(buildDir, "be-node-anime-watch.zip"));
 
         // Inizializziamo archiver
         const archive = archiver("zip", { zlib: { level: 9 } });
@@ -67,7 +67,7 @@ function main() {
         // Quando l'archivio è finalizzato, scriviamo un messaggio di completamento
         output.on("close", () => {
             console.log(`Creato ZIP con ${archive.pointer()} byte`);
-            console.log(`File generato: ${path.join(buildDir, "be-node-portfolio.zip")}`);
+            console.log(`File generato: ${path.join(buildDir, "be-node-anime-watch.zip")}`);
         });
 
         // Colleghiamo lo stream di archiver con il file di output
