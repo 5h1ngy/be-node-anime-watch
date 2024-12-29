@@ -31,11 +31,12 @@
   },
   "main": "dist/index.js",
   "scripts": {
-    "dev": "cross-env NODE_ENV=development ts-node-dev --respawn --transpile-only --notify false -r tsconfig-paths/register src/index.ts",
-    "build": "cross-env NODE_ENV=production tsc && tsc-alias",
-    "start": "cross-env NODE_ENV=production node dist/index.js",
-    "docs": "typedoc",
-    "clean": "rm -rfdv node_modules dist docs data logs",
+    "start:dev": "cross-env NODE_ENV=development ts-node-dev --respawn --transpile-only --notify false -r tsconfig-paths/register src/index.ts",
+    "start:prod": "cross-env NODE_ENV=production node dist/index.js",
+    "build:prod": "cross-env NODE_ENV=production tsc && tsc-alias && yarn pack:prod",
+    "build:docs": "typedoc",
+    "pack:prod": "node scripts/pack.js",
+    "clean": "rm -rfdv node_modules build dist docs logs .yarn .yarn-cache",
     "update": "yarn up '*@latest'"
   },
   "dependencies": {
@@ -71,6 +72,7 @@
     "@types/swagger-ui-express": "^4.1.7",
     "@typescript-eslint/eslint-plugin": "^8.16.0",
     "@typescript-eslint/parser": "^8.16.0",
+    "archiver": "^7.0.1",
     "cross-env": "^7.0.3",
     "eslint": "^9.16.0",
     "eslint-import-resolver-alias": "^1.1.2",

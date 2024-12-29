@@ -42,49 +42,49 @@ export class TagDetailsService {
    * @param size The number of items per page.
    * @returns Paginated anime details associated with matching tags.
    */
-  async searchByLabel(label: string, offset: number = 1, size: number = 10): Promise<PaginatedResultDto<AnimeDto>> {
+  // async searchByLabel(label: string, offset: number = 1, size: number = 10): Promise<PaginatedResultDto<AnimeDto>> {
 
-    const tags = await TagDetails.findAll({
-      where: { label: { [Op.like]: `%${label}%` } },
-      include: [{ association: "animes", required: false }],
-      order: [["label", "ASC"]],
-    });
+  //   const tags = await TagDetails.findAll({
+  //     where: { label: { [Op.like]: `%${label}%` } },
+  //     include: [{ association: "animes", required: false }],
+  //     order: [["label", "ASC"]],
+  //   });
 
-    const totalAnimes = tags.reduce((sum, tag) => sum + (tag.animes?.length || 0), 0);
-    const animeOffset = (offset - 1) * size;
+  //   const totalAnimes = tags.reduce((sum, tag) => sum + (tag.animes?.length || 0), 0);
+  //   const animeOffset = (offset - 1) * size;
 
-    const paginatedAnimes: AnimeDto[] = [];
-    let animeCount = 0;
+  //   const paginatedAnimes: AnimeDto[] = [];
+  //   let animeCount = 0;
 
-    for (const tag of tags) {
-      for (const anime of tag.animes) {
-        if (animeCount >= animeOffset && paginatedAnimes.length < size) {
-          const details = await AnimeDetails.findByPk(anime.id, {
-            include: [
-              { association: "asset", required: false }
-            ],
-          });
+  //   for (const tag of tags) {
+  //     for (const anime of tag.animes) {
+  //       if (animeCount >= animeOffset && paginatedAnimes.length < size) {
+  //         const details = await AnimeDetails.findByPk(anime.id, {
+  //           include: [
+  //             { association: "asset", required: false }
+  //           ],
+  //         });
 
-          if (details) {
-            paginatedAnimes.push(
-              new AnimeDto(
-                details.id,
-                details.title || null,
-                details.type || null,
-                details.asset?.id
-                  ? { id: details.asset.id, thumbnail: details.asset.thumbnail }
-                  : null
-              )
-            );
-          }
-        }
-        animeCount++;
-        if (paginatedAnimes.length >= size) break;
-      }
-    }
+  //         if (details) {
+  //           paginatedAnimes.push(
+  //             new AnimeDto(
+  //               details.id,
+  //               details.title || null,
+  //               details.type || null,
+  //               details.asset?.id
+  //                 ? { id: details.asset.id, thumbnail: details.asset.thumbnail }
+  //                 : null
+  //             )
+  //           );
+  //         }
+  //       }
+  //       animeCount++;
+  //       if (paginatedAnimes.length >= size) break;
+  //     }
+  //   }
 
-    const totalPages = Math.ceil(totalAnimes / size);
+  //   const totalPages = Math.ceil(totalAnimes / size);
 
-    return new PaginatedResultDto<AnimeDto>(paginatedAnimes, totalAnimes, offset, size, totalPages);
-  }
+  //   return new PaginatedResultDto<AnimeDto>(paginatedAnimes, totalAnimes, offset, size, totalPages);
+  // }
 }

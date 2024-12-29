@@ -43,13 +43,13 @@ export class TagController {
    * @param size The pagination size.
    * @returns Paginated anime details associated with the tag.
    */
-  @Get("/search/:label")
-  async searchByLabel(
-    @Param("label") label: string,
-    @QueryParam("offset", { required: false }) offset: number = 1,
-    @QueryParam("size", { required: false }) size: number = 10
-  ): Promise<PaginatedResultDto<AnimeDto>> {
-    logInfo(`Searching anime by tag label - Label: "${label}"`);
-    return await this.tagDetailsService.searchByLabel(label, offset, size);
-  }
+  // @Get("/search/:label")
+  // async searchByLabel(
+  //   @Param("label") label: string,
+  //   @QueryParam("offset", { required: false }) offset: number = 1,
+  //   @QueryParam("size", { required: false }) size: number = 10
+  // ): Promise<PaginatedResultDto<AnimeDto>> {
+  //   logInfo(`Searching anime by tag label - Label: "${label}"`);
+  //   return await this.tagDetailsService.searchByLabel(label, offset, size);
+  // }
 }
